@@ -1,18 +1,20 @@
-var traildb = require('../');
-var TrailDBConstructor = traildb.TrailDBConstructor;
-var TrailDB = traildb.TrailDB;
+const fs = require('fs');
+const traildb = require('../');
+const TrailDBConstructor = traildb.TrailDBConstructor;
+const TrailDB = traildb.TrailDB;
 
-var user1 = '771799eb-6a0d-4555-9917-0a5d449b35ab';
-var user2 = '8ff9b509-84a6-4888-8215-e66d7aefd1bc';
-
-var cons = new TrailDBConstructor({
-  path: __dirname + '/test.tdb',
+const user1 = '771799eb-6a0d-4555-9917-0a5d449b35ab';
+const user2 = '8ff9b509-84a6-4888-8215-e66d7aefd1bc';
+const filepath = `${__dirname}/test.tdb`;
+const cons = new TrailDBConstructor({
+  path: filepath,
   fieldNames: ['field1', 'field2']
 });
-cons.add(user1, 123, ['a']);
-cons.add(user1, 124, ['b', 'c']);
-cons.add(user2, 125, ['b', 'e']);
-cons.add(user2, 126, ['d', 'e']);
+if(fs.existsSync(filepath)) cons.append(new TrailDB({path: filepath}));
+cons.add(user1, new Date(), ['a']);
+cons.add(user1, new Date(), ['b', 'c']);
+cons.add(user2, new Date(), ['b', 'e']);
+cons.add(user2, new Date(), ['d', 'e']);
 cons.finalize();
 cons.close();
 
@@ -20,13 +22,11 @@ cons.close();
  * Unfiltered
  */
 console.log('Output (unfiltered):');
-var tdb = new TrailDB({
-  path: __dirname + '/test.tdb'
-});
-for (var trail of tdb.trails()) {
-  var trailUuid = trail.getUuid();
-  for (var event of trail.events({ toMap: true })) {
-    console.log(trailUuid, event.timestamp, JSON.stringify(event.map));
+const tdb = new TrailDB({path: filepath});
+for (const trail of tdb.trails()) {
+  const trailUuid = trail.getUuid();
+  for (const event of trail.events({ toMap: true })) {
+    console.log(trailUuid, event.timestamp, event.map);
   }
 }
 
@@ -42,10 +42,12 @@ for (var trail of tdb.trails()) {
  * previous clause (OR). Disregarded on the first filter statement.
  */
 console.log('Output (filtered):');
-for (var trail of tdb.trails()) {
-  var trailUuid = trail.getUuid();
+
+for (const trail of tdb.trails()) {
+  const trailUuid = trail.getUuid();
+
   // This filter reads, "( field1 == 'b' && field2 == 'e' )"
-  var filters = [
+  const filters = [
     {
       field: 'field1',
       val: 'b',
@@ -59,7 +61,8 @@ for (var trail of tdb.trails()) {
       and: true // Join to previous filter with a new 'and' clause
     }
   ];
-  for (var event of trail.events({ toMap: true, filter: filters })) {
-    console.log(trailUuid, event.timestamp, JSON.stringify(event.map));
+
+  for (const event of trail.events({ toMap: true, filter: filters })) {
+    console.log(trailUuid, event.timestamp, event.map);
   }
 }
