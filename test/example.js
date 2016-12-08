@@ -66,3 +66,5 @@ for (const trail of tdb.trails()) {
     console.log(trailUuid, event.timestamp, event.map);
   }
 }
+
+tdb.close();
