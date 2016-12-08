@@ -19,6 +19,7 @@ cons.close();
 /*
  * Unfiltered
  */
+console.log('Output (unfiltered):');
 var tdb = new TrailDB({
   path: __dirname + '/test.tdb'
 });
@@ -40,6 +41,7 @@ for (var trail of tdb.trails()) {
  * filter.and = {Boolean} is this filter a new clause (AND) or part of the
  * previous clause (OR). Disregarded on the first filter statement.
  */
+console.log('Output (filtered):');
 for (var trail of tdb.trails()) {
   var trailUuid = trail.getUuid();
   // This filter reads, "( field1 == 'b' && field2 == 'e' )"
