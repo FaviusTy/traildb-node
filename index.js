@@ -1,1 +1,1 @@
-module.exports = require('./lib/traildb');
+module.exports = require('./lib');
